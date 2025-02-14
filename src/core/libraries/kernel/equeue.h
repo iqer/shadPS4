@@ -110,10 +110,9 @@ struct EqueueEvent {
         DceHint dce_hint = std::bit_cast<DceHint>(hint);
         DceData dce_data = std::bit_cast<DceData>(event.data);
 
-        const auto hint_h = static_cast<u32>(hint >> 8) & 0xffffff;
-        const auto ident_h = static_cast<u32>(event.ident << 8);
+        const auto video_id = static_cast<u8>(event.ident << 8);
         if (dce_hint.event_id == event.ident && event.ident != 0xfe &&
-            ((hint_h ^ ident_h) & 0xff) == 0) {
+            dce_hint.video_id == video_id) {
             dce_data.time = Common::FencedRDTSC();
             if (dce_data.counter != 15) {
                 dce_data.counter++;
