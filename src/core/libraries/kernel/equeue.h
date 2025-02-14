@@ -63,16 +63,20 @@ struct SceKernelEvent {
 
 union DceHint {
     u64 raw;
-    u32 event_id : 8;
-    u32 : 8;
-    u64 flip_arg : 32;
+    struct {
+        u64 event_id : 8;
+        u64 video_id : 8;
+        u64 flip_arg : 32;
+    };
 };
 
 union DceData {
     u64 raw;
-    u64 time : 12;
-    u32 counter : 4;
-    u64 hint : 48;
+    struct {
+        u64 time : 12;
+        u64 counter : 4;
+        u64 hint : 48;
+    };
 };
 
 struct EqueueEvent {
@@ -103,8 +107,8 @@ struct EqueueEvent {
             return;
         }
 
-        DceHint dce_hint = *reinterpret_cast<DceHint*>(&hint);
-        DceData dce_data = *reinterpret_cast<DceData*>(&event.data);
+        DceHint dce_hint = std::bit_cast<DceHint>(hint);
+        DceData dce_data = std::bit_cast<DceData>(event.data);
 
         const auto hint_h = static_cast<u32>(hint >> 8) & 0xffffff;
         const auto ident_h = static_cast<u32>(event.ident << 8);
